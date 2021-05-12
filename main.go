@@ -31,14 +31,14 @@ func main() {
 	collection := client.Database("testdb").Collection("people")
 
 	// insert
-	Minh := Person{"Minh", 24}
-	Cici := Person{"Cici", 25}
-	Junior := Person{"Junior", 4}
+	minh := Person{"Minh", 24}
+	cici := Person{"Cici", 25}
+	junior := Person{"Junior", 4}
 
-	_, e = collection.InsertOne(context.TODO(), john)
+	_, e = collection.InsertOne(context.TODO(), minh)
 	CheckError(e)
 
-	persons := []interface{}{Cici, Junior}
+	persons := []interface{}{cici, junior}
 	_, e = collection.InsertMany(context.TODO(), persons)
 	CheckError(e)
 
