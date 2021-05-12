@@ -14,33 +14,24 @@ type Person struct {
 	Age  int
 }
 
+var (
+	collection *mongo.Collection
+	ctx        = context.TODO()
+)
+
 func main() {
-
-	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-
-	// Connect to MongoDB
-	client, e := mongo.Connect(context.TODO(), clientOptions)
-	CheckError(e)
-
-	// Check the connection
-	e = client.Ping(context.TODO(), nil)
-	CheckError(e)
-
-	// get collection as ref
-	collection := client.Database("testdb").Collection("people")
-
 	// insert
-	minh := Person{"Minh", 24}
-	cici := Person{"Cici", 25}
-	junior := Person{"Junior", 4}
+	minh := &Person{"Minh", 24}
+	cici := &Person{"Cici", 25}
+	junior := &Person{"Junior", 4}
+	// insert one
+	addMinh := addPerson(ctx, minh)
+	CheckError(addMinh)
 
-	_, e = collection.InsertOne(context.TODO(), minh)
-	CheckError(e)
-
+	//insert many
 	persons := []interface{}{cici, junior}
-	_, e = collection.InsertMany(context.TODO(), persons)
-	CheckError(e)
+	addMany := addManyPeople(ctx, persons)
+	CheckError(addMany)
 
 	// update
 	filter := bson.D{{"name", "Minh"}}
@@ -51,21 +42,63 @@ func main() {
 		}},
 	}
 
-	_, e = collection.UpdateOne(context.TODO(), filter, update)
-	CheckError(e)
+	updateMinh := updatePerson(ctx, filter, update)
+	CheckError(updateMinh)
 
-	// find
+	// find a data
 	var res Person
-	e = collection.FindOne(context.TODO(), filter).Decode(&res)
-	fmt.Println(res)
+	respond, _ := findaPerson(ctx, filter, res)
+	fmt.Println(respond)
 
-	// delete
-	_, e = collection.DeleteMany(context.TODO(), bson.D{{}})
-	CheckError(e)
+	// // delete All data in the Database
+	// deleteAll := deleteMany(ctx)
+	// CheckError(deleteAll)
 }
 
-func CheckError(e error) {
-	if e != nil {
-		fmt.Println(e)
+// Initialize mongo DB connection and Database
+func init() {
+	// Set client options
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+
+	// Connect to MongoDB
+	client, err := mongo.Connect(ctx, clientOptions)
+	CheckError(err)
+
+	// Check the connection
+	err = client.Ping(ctx, nil)
+	CheckError(err)
+
+	// get collection as ref
+	collection = client.Database("testdb").Collection("people")
+}
+
+func addPerson(ctx context.Context, person *Person) error {
+	_, err := collection.InsertOne(ctx, person)
+	return err
+}
+
+func addManyPeople(ctx context.Context, persons []interface{}) error {
+	_, err := collection.InsertMany(ctx, persons)
+	return err
+}
+
+func updatePerson(ctx context.Context, filter bson.D, update bson.D) error {
+	_, err := collection.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func findaPerson(ctx context.Context, filter bson.D, res Person) (Person, error) {
+	e := collection.FindOne(ctx, filter).Decode(&res)
+	return res, e
+}
+
+// func deleteMany(ctx context.Context) error {
+// 	_, err := collection.DeleteMany(ctx, bson.D{{}})
+// 	return err
+// }
+
+func CheckError(err error) {
+	if err != nil {
+		fmt.Println(err)
 	}
 }
