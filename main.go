@@ -31,23 +31,23 @@ func main() {
 	collection := client.Database("testdb").Collection("people")
 
 	// insert
-	john := Person{"John", 24}
-	jane := Person{"Jane", 27}
-	ben := Person{"Ben", 16}
+	Minh := Person{"Minh", 24}
+	Cici := Person{"Cici", 25}
+	Junior := Person{"Junior", 4}
 
 	_, e = collection.InsertOne(context.TODO(), john)
 	CheckError(e)
 
-	persons := []interface{}{jane, ben}
+	persons := []interface{}{Cici, Junior}
 	_, e = collection.InsertMany(context.TODO(), persons)
 	CheckError(e)
 
 	// update
-	filter := bson.D{{"name", "John"}}
+	filter := bson.D{{"name", "Minh"}}
 
 	update := bson.D{
 		{"$set", bson.D{
-			{"age", 26},
+			{"age", 30},
 		}},
 	}
 
