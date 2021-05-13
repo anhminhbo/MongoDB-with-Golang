@@ -20,7 +20,7 @@ var (
 )
 
 func main() {
-	// insert
+// insert
 	minh := &Person{"Minh", 24}
 	cici := &Person{"Cici", 25}
 	junior := &Person{"Junior", 4}
@@ -33,7 +33,7 @@ func main() {
 	addMany := addManyPeople(ctx, persons)
 	CheckError(addMany)
 
-	// update
+// update
 	filter := bson.D{{"name", "Minh"}}
 
 	update := bson.D{
@@ -45,12 +45,12 @@ func main() {
 	updateMinh := updatePerson(ctx, filter, update)
 	CheckError(updateMinh)
 
-	// find a data
+// find a data
 	var res Person
 	respond, _ := findaPerson(ctx, filter, res)
 	fmt.Println(respond)
 
-	// // delete All data in the Database
+// delete All data in the Database
 	// deleteAll := deleteMany(ctx)
 	// CheckError(deleteAll)
 }
@@ -71,32 +71,33 @@ func init() {
 	// get collection as ref
 	collection = client.Database("testdb").Collection("people")
 }
-
+// Function to add one person
 func addPerson(ctx context.Context, person *Person) error {
 	_, err := collection.InsertOne(ctx, person)
 	return err
 }
-
+//Function to add many people
 func addManyPeople(ctx context.Context, persons []interface{}) error {
 	_, err := collection.InsertMany(ctx, persons)
 	return err
 }
-
+// Function to update a person 
 func updatePerson(ctx context.Context, filter bson.D, update bson.D) error {
 	_, err := collection.UpdateOne(ctx, filter, update)
 	return err
 }
-
+// Function to find a person
 func findaPerson(ctx context.Context, filter bson.D, res Person) (Person, error) {
 	e := collection.FindOne(ctx, filter).Decode(&res)
 	return res, e
 }
-
+// Funtion to delete all data in the DB
 // func deleteMany(ctx context.Context) error {
 // 	_, err := collection.DeleteMany(ctx, bson.D{{}})
 // 	return err
 // }
 
+// Function to check error
 func CheckError(err error) {
 	if err != nil {
 		fmt.Println(err)
